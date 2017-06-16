@@ -166,4 +166,19 @@ export default class Util {
   static cloneDeep(objects) {
     return _.cloneDeep(objects);
   }
+
+  /**
+   * 取得url中指定参数的值
+   * @param  {String} paramKey
+   * @return {String|Array}
+   */
+  static getUrlParameter(paramKey) {
+    const urlParam = window.location.search.substring(1);
+    const urlVariables = urlParam.split('&');
+    let ret = urlVariables.find(key => key.split('=')[0] === paramKey);
+    if (ret) {
+      ret = ret.split('=')[1];
+    }
+    return ret;
+  }
 }

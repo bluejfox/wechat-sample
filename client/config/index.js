@@ -11,10 +11,10 @@ function getEnvConfig (key) {
 var config = {
   build: {
     env: prodEnvObj,
-    index: path.resolve(__dirname, '../dist/index.html'),
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    index: path.resolve(__dirname, '../../server/public/index.html'),
+    assetsRoot: path.resolve(__dirname, '../../server/public'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: '',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
@@ -31,7 +31,7 @@ var config = {
   dev: {
     env: devEnvObj,
     port: 8083,
-    autoOpenBrowser: true,
+    autoOpenBrowser: false,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     // cann't use es6 grammar, so define it in other ways

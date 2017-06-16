@@ -6,14 +6,17 @@
   "scripts": {
     "dev": "node build/dev-server.js",
     "build": "node build/build.js",
-    "lint": "eslint --ext .js,.vue src test/unit/specs"
+    "lint": "eslint --ext .js,.vue src test/unit/specs",
+    "publish": "npm run build && cf push wechatapi -p ../server"
   },
   "dependencies": {
     "axios": "^0.15.x",
     "lodash": "^4.17.x",
     "moment": "^2.17.x",
     "vue": "^2.2.x",
-    "vue-router": "^2.2.x"
+    "vue-router": "^2.2.x",
+    "vuex": "^2.3.1",
+    "weixin-js-sdk": "^1.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.2",

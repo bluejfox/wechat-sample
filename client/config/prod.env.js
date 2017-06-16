@@ -1,6 +1,6 @@
 module.exports = {
   NODE_ENV: '"production"',
-  PROXY_KEY: '"/WS"',
+  PROXY_KEY: '"/WS/"',
   APP_TITLE: '"UME System"',
   TARGET_WEBSERVICE_SERVER: '"http://www.example.com"',
   SERVICE_TIME_OUT: '10000',

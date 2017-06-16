@@ -2,11 +2,13 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue';
 import App from '@/App';
-import service from '@/component/plugin/service';
 import context from '@/component/plugin/context';
+import { router, navigate } from '@/component/plugin/navigate/index';
+import service from '@/component/plugin/service';
 import ErrorHandler from '@/model/ErrorHandler';
 import Util from '@/model/Util';
-import router from '@/router';
+// import router from '@/router';
+import store from '@/store';
 
 // 加载公用UI控件
 // Vue.use(UI);
@@ -28,13 +30,15 @@ function handleAppError(error, source) {
 Vue.config.errorHandler = handleAppError;
 window.onerror = handleAppError;
 
-Vue.use(service);
 Vue.use(context);
+Vue.use(navigate);
+Vue.use(service);
 
 /* eslint-disable no-new */
 new Vue({
   el: '#main',
   router,
+  store,
   template: '<App/>',
   components: { App },
   methods: {

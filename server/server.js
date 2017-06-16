@@ -1,123 +1,144 @@
 var express = require("express");
-var request = require("request");
-var qs = require('querystring');
+var session = require('express-session');
 var crypto = require('crypto');
-var mysql = require("./mysql.js");
+var config = require('./config.js');
+var wechat = require('./wechat.js');
 var bodyParser = require('body-parser');
 var app = express();
 
 app.use("/client", express.static('public'));
+app.use(session({
+  secret: 'Ilovecat',
+  key: 'sessionId',
+  resave: false,
+  saveUninitialized: true
+}))
 app.use(bodyParser.json());
 
 var wechatAccessToken = null;
-var APP_ID = "wx476f7fe37b9c59ea";
 
-// 取得全局Token
-app.post("/WS/token", function(req, res) {
-    var baseAuthUrl = "https://api.weixin.qq.com/cgi-bin/token?";
-    // 获取access_token
-    request({
-        "url": baseAuthUrl + qs.stringify({
-            "grant_type": "client_credential",
-            "appid": APP_ID,
-            "secret": "389c441d5c2ed556ed4a8452a7743508"
-        }),
-        "method": "GET"
-    }, function(error, response, body){
-        var resultCode;
-        if(response.statusCode === 200){
-            var data = JSON.parse(body);
-            if (!!data.errcode) {
-                resultCode = 0;
-            }else{
-                console.log("access_token :: " + data.access_token);
-                console.log("expires_in :: " + data.expires_in);
-                wechatAccessToken = data.access_token;
-                resultCode = 1;
-            }
-        }
-        res.json({
-            "resultCode": resultCode,
-            "token": wechatAccessToken
-        });
+function createResponseObject(obj, code) {
+  return {
+    resultCode: code === false ? 1 : 0,
+    resultObject: obj
+  };
+}
+
+// 登录服务
+app.post("/WS/login", function(req, res){
+  var code = req.body.code;
+  if (code) {
+    // 取得用户AccessToken
+    wechat.getUserAccessToken(code, function(accessTokenObj){
+      if (accessTokenObj) {
+        req.session.accessToken = accessTokenObj;
+        // 取得用户信息
+        wechat.getUserInfo(accessTokenObj["access_token"]
+          , accessTokenObj["openid"]
+          , function(userObject){
+            res.json(createResponseObject(userObject))
+          });
+      }
     });
+  }
 });
 
-app.post("/WS/auth", function(req, res){
-
-});
-
-app.post("/WS/configInfo", function(req, res){
-    var url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?";
-    var currentUrl = req.body.currentUrl;
-    request({
-        "url": url + qs.stringify({
-            "access_token": wechatAccessToken,
-            "type": "jsapi"
-        }),
-        "method": "GET"
-    }, function(error, response, body){
-        var resultCode;
-        var noncestr = "Wm3WZYTPz0wzccnW";
-        var timestamp = "1414587457";
-        var sha1 = null;
-        if(response.statusCode === 200){
-            var data = JSON.parse(body);
-            if (!!data.errcode) {
-                resultCode = 0;
-            }else{
-                var ticket = data.ticket;
-                console.log("js_ticket :: " + ticket);
-                var signatureString = "jsapi_ticket=" + ticket +
-                    "&noncestr=" + noncestr +
-                    "&timestamp=" + timestamp +
-                    "&url=" + currentUrl;
-                sha1 = crypto.createHash("sha1").update(signatureString);
-                resultCode = 1;
-            }
+// 取得config接口的权限验证配置信息
+app.post("/WS/authJsSdk", function(req, res){
+  var currentUrl = req.body.currentUrl;
+  console.log('currentToken :: ' + req.session.accessToken["access_token"]);
+  wechat.getJsTicket(function(jsTicketObject) {
+    var noncestr = "Wm3WZYTPz0wzccnW";
+    var timestamp = "1414587457";
+    var sha1 = null;
+    var resultCode = 1;
+    console.log('jsTicketObject :: ' + JSON.stringify(jsTicketObject));
+    if(jsTicketObject.ticket){
+      var ticket = jsTicketObject.ticket;
+      var signatureString = "jsapi_ticket=" + ticket +
+          "&noncestr=" + noncestr +
+          "&timestamp=" + timestamp +
+          "&url=" + currentUrl;
+      sha1 = crypto.createHash("sha1").update(signatureString);
+      resultCode = 0;
+    }
+    res.json({
+        "resultCode": resultCode,
+        "resultObject": {
+          "appId": config.APP_ID,
+          "nonceStr": noncestr,
+          "timestamp": timestamp,
+          "signature": sha1.digest("hex")
         }
-        res.json({
-            "resultCode": resultCode,
-            "appId": APP_ID,
-            "nonceStr": noncestr,
-            "timestamp": timestamp,
-            "signature": sha1.digest("hex")
-        });
     });
+  });
 });
 
-app.post("/WS/genconv", function(req, res){
-    var longitude = req.body.longitude;
-    var latitude = req.body.latitude;
-    request({
-        "url": "http://api.map.baidu.com/geoconv/v1/?" + qs.stringify({
-            "coords": longitude + "," + latitude,
-            "from": "3",
-            "to": "5",
-            "ak": "RRCAuqbWzpewMKLWmKTKiHpGRP8ba88Q"
-        })
-    }, function(error, response, body){
-        var resultCode;
-        if(response.statusCode === 200){
-            var data = JSON.parse(body);
-            if (data.status !== 0) {
-                resultCode = 0;
-            }else{
-                var r = data.result;
-                if (r.length > 0){
-                    longitude = r[0].x;
-                    latitude = r[0].y;
-                }
-                resultCode = 1;
-            }
-        }
-        res.json({
-            "resultCode": resultCode,
-            "longitude": longitude,
-            "latitude": latitude
-        });
-    });
-});
+
+// app.get("/WS/test", function(req, res){
+//     var date = new Date();
+//     console.log(Date.now());
+//     console.log(date - new Date(2017, 5, 13, 10, 34, 00));
+//     res.json({});
+// });
+
+// // 取得全局Token
+// app.post("/WS/token", function(req, res) {
+//     var currentDate = null;
+//     var time = null;
+//     // 判断是否需要获取Token
+//     if (wechatAccessToken) {
+//         currentDate = Date.now();
+//         time = (currentDate - wechatAccessToken.currentDate) / 1000;
+//         console.log("time :: " + time);
+//         if (time <= wechatAccessToken.expiresIn) {
+//             res.json({
+//                 "resultCode": 1,
+//                 "resultObject": {
+//                   "token": wechatAccessToken.accessToken
+//                 }
+//             });
+//             return;
+//         }
+//     }
+//     var baseAuthUrl = "https://api.weixin.qq.com/cgi-bin/token?";
+//     // 获取access_token
+//     request({
+//         "url": baseAuthUrl + qs.stringify({
+//             "grant_type": "client_credential",
+//             "appid": config.APP_ID,
+//             "secret": config.APP_SECRET
+//         }),
+//         "method": "GET"
+//     }, function(error, response, body){
+//         var resultCode;
+//         if(response.statusCode === 200){
+//             var data = JSON.parse(body);
+//             if (!!data.errcode) {
+//                 resultCode = 0;
+//             }else{
+//                 console.log("access_token :: " + data.access_token);
+//                 console.log("expires_in :: " + data.expires_in);
+//                 wechatAccessToken = {
+//                     'accessToken': data.access_token,
+//                     'expiresIn': data.expires_in,
+//                     'currentDate': Date.now()
+//                 };
+//                 resultCode = 1;
+//             }
+//         }
+//         res.json({
+//             "resultCode": resultCode,
+//             "resultObject": {
+//               "token": wechatAccessToken.accessToken
+//             }
+//         });
+//     });
+// });
+
+// app.post("/WS/auth", function(req, res){
+
+// });
 
 // app.post("/WS/user", function(req, res) {
 //     console.log("user Post");
