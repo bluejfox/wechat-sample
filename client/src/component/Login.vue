@@ -39,7 +39,7 @@
         });
       },
       doForward() {
-        this.$router.push({ name: 'A' });
+        this.$navi.to('JSSdkDemo', { id: 'id1' });
       },
     },
   };

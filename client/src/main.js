@@ -7,7 +7,6 @@ import { router, navigate } from '@/component/plugin/navigate/index';
 import service from '@/component/plugin/service';
 import ErrorHandler from '@/model/ErrorHandler';
 import Util from '@/model/Util';
-// import router from '@/router';
 import store from '@/store';
 
 // 加载公用UI控件

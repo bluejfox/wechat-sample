@@ -8,7 +8,7 @@
     <img :src="uploadImage"/>
     <br/>
     <input type="button" value="跳转至上页" @click="naviToLogin">
-    <input type="button" value="返回上页" @click="naviToLogin">
+    <input type="button" value="返回上页" @click="backToLogin">
     <input type="button" value="关闭窗口" @click="doClose">
   </div>
 </template>
@@ -65,6 +65,9 @@
       },
       naviToLogin() {
         this.$navi.to('Login');
+      },
+      backToLogin() {
+        this.$navi.back();
       },
       doClose() {
         wx.closeWindow();
