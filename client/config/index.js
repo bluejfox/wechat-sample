@@ -53,7 +53,9 @@ config.dev.proxyTable[proxyKey] = {
   target: getEnvConfig('TARGET_WEBSERVICE_SERVER'),
   changeOrigin: true,
   onProxyReq: function(proxyReq, req, res) {
-    mock.call(proxyReq, req, res);
+    if (devEnvObj.MOCK_MODE === '"true"') {
+      mock.call(proxyReq, req, res);
+    }
   }
 }
 config.dev.proxyTable[proxyKey].pathRewrite = {};
