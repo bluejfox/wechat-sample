@@ -1,5 +1,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path');
+var mock = require('../mock/mock.js');
 var devEnvObj = require('./dev.env');
 var prodEnvObj = require('./prod.env');
 
@@ -50,7 +51,10 @@ var proxyKey = getEnvConfig('PROXY_KEY');
 var pathRegex = '^' + proxyKey;
 config.dev.proxyTable[proxyKey] = {
   target: getEnvConfig('TARGET_WEBSERVICE_SERVER'),
-  changeOrigin: true
+  changeOrigin: true,
+  onProxyReq: function(proxyReq, req, res) {
+    mock.call(proxyReq, req, res);
+  }
 }
 config.dev.proxyTable[proxyKey].pathRewrite = {};
 config.dev.proxyTable[proxyKey].pathRewrite[pathRegex] = '';

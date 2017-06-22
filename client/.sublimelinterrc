@@ -1,0 +1,7 @@
+{
+  "linters": {
+    "eslint": {
+        "excludes": ["mock/*.js"]
+    }
+  }
+}
