@@ -5,6 +5,7 @@ import App from '@/App';
 import context from '@/component/plugin/context';
 import { router, navigate } from '@/component/plugin/navigate/index';
 import service from '@/component/plugin/service';
+import UI from '@/component/ui';
 import ErrorHandler from '@/model/ErrorHandler';
 import Util from '@/model/Util';
 import store from '@/store';
@@ -29,6 +30,7 @@ function handleAppError(error, source) {
 Vue.config.errorHandler = handleAppError;
 window.onerror = handleAppError;
 
+Vue.use(UI);
 Vue.use(context);
 Vue.use(navigate);
 Vue.use(service);

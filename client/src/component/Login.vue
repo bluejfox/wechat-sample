@@ -7,8 +7,16 @@
     <br/>
     <img :src="user.headimgurl">
     <input type="button" @click="doForward" value="JSSDK Demo"/>
+    <input type="button" @click="popupVisible = true" value="showPopup">
+    <one-message
+      :visible.sync="popupVisible"
+      type="error"
+      message="123457">
+    </one-message>
   </div>
 </template>
+<style scoped>
+</style>
 <script>
   import Util from '@/model/Util';
 
@@ -17,6 +25,7 @@
       return {
         currentCount: 0,
         user: {},
+        popupVisible: false,
       };
     },
     created() {
