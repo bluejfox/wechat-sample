@@ -28,6 +28,10 @@ exports.call = function(proxyReq, req, res) {
         jsonFilePath = './datasource/' + proxyPath + '.json';
         jsonFilePath = path.resolve(__dirname, jsonFilePath);
         mockJson = Mock.mock(JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')));
+        mockJson = {
+          resultCode: 0,
+          resultObject: mockJson
+        };
       }
     } catch (error) {
       mockJson = {
