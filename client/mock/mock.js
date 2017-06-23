@@ -16,6 +16,10 @@ function isExclude(service) {
   return ret;
 }
 
+function getJsonFileFullPath(jsonPath) {
+  return path.resolve(__dirname, jsonPath);
+}
+
 exports.call = function(proxyReq, req, res) {
   var proxyPath = proxyReq.path;
   var jsonFilePath = null;
@@ -23,25 +27,13 @@ exports.call = function(proxyReq, req, res) {
   if (proxyPath && proxyPath !== '' && proxyPath.indexOf('/') !== -1) {
     proxyPath = proxyPath.replace(config.baseUrl, '');
     try {
-      debugger;
       if (!isExclude(proxyPath)) {
-        jsonFilePath = './datasource/' + proxyPath + '.json';
-        jsonFilePath = path.resolve(__dirname, jsonFilePath);
+        jsonFilePath = getJsonFileFullPath('./datasource/' + proxyPath + '.json');
         mockJson = Mock.mock(JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')));
-        mockJson = {
-          resultCode: 0,
-          resultObject: mockJson
-        };
       }
     } catch (error) {
-      mockJson = {
-        resultCode: 1,
-        exception: [
-          {
-            'message': '[' + proxyPath + '] 无法取得指定的Mock文件'
-          }
-        ],
-      };
+      jsonFilePath = getJsonFileFullPath('./datasource/error.json');
+      mockJson = Mock.mock(JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')));
     }
   }
   res.json(mockJson);
