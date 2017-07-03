@@ -59,7 +59,7 @@ function throwError(error) {
 
 export default class UmeHttp {
   /**
-   * 执行指定服务
+   * 调用指定服务
    * @param  {String}  serviceId    服务ID(EMWS00001)
    * @param  {Array}   serviceParam 服务参数信息
    * @param  {Object}  config       服务配置信息
@@ -111,5 +111,30 @@ export default class UmeHttp {
         store.commit('loading', false);
       });
     });
+  }
+
+  /**
+   * 同时通过异步的方式调用多个服务
+   * @example
+   * 如果想调用WS001和WS002两个服务，可以使用如下方式调用：
+   * const ws001 = {
+   *  id: 'WS001',
+   *  param: [aaa],
+   * };
+   * const ws002 = {
+   *  id: 'WS002',
+   *  param: [bbb],
+   * };
+   * const serviceArr = [ws001, ws002];
+   * UmeHttp.invokeMulti(serviceArr).then((res) => {})
+   * 如上res数组内的第一个元素为WS001服务的返回值，其他以此类推。
+   * @param  {Array}  serviceArr  服务列表
+   * @param  {Object} [config={}] 配置信息
+   * @return {Promise}
+   */
+  static invokeMulti(serviceArr, config = {}) {
+    const promiseArr = serviceArr.map(serviceObject =>
+      UmeHttp.invoke(serviceObject.id, serviceObject.param, config));
+    return Promise.all(promiseArr);
   }
 }

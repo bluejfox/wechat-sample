@@ -18,7 +18,7 @@ export default class Util {
    * @return {*}
    */
   static getConfigValue(key) {
-    const env = process.env.NODE_ENV === 'production' ? 'build' : 'dev';
+    const env = Util.isProdunctionEnv() ? 'build' : 'dev';
     const result = config[env].env[key];
     return result ? result.replace(/"/g, '') : '';
   }
