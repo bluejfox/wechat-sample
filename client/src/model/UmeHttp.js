@@ -62,7 +62,7 @@ export default class UmeHttp {
    * 调用指定服务
    * @param  {String}  serviceId    服务ID(EMWS00001)
    * @param  {Array}   serviceParam 服务参数信息
-   * @param  {Object}  config       服务配置信息
+   * @param  {Object}  config       服务配置信息（isShowError[Boolean]是否显示异常）
    * @return {Promise} Promise
    */
   static invoke(serviceId, serviceParam = [], config = {}) {
