@@ -3,7 +3,6 @@ var session = require('express-session');
 var crypto = require('crypto');
 var config = require('./config.js');
 var wechat = require('./wechat.js');
-var mock = require('./mock.js');
 var bodyParser = require('body-parser');
 var app = express();
 
@@ -24,6 +23,34 @@ function createResponseObject(obj, code) {
     resultObject: obj
   };
 }
+
+app.get("/WS/sse", function(req, res) {
+  res.writeHead(200, {
+    "Content-Type":"text/event-stream",
+    "Cache-Control":"no-cache",
+    "Connection":"keep-alive",
+    "Access-Control-Allow-Origin": '*',
+  });
+  res.write("retry: 10000\n");
+  res.write("event: status\n");
+  res.write("data: " + "uploaded" + "\n\n");
+
+  setTimeout(function() {
+    res.write("data: " + "checked" + "\n\n");
+    setTimeout(function() {
+      res.write("data: " + "finish" + "\n\n");
+    }, 1000);
+  }, 1000);
+
+  // interval = setInterval(function () {
+  //   res.write("data: " + (new Date()) + "\n\n");
+  // }, 1000);
+  //
+  req.connection.addListener("close", function () {
+    // clearInterval(interval);
+    console.log('close');
+  }, false);
+});
 
 // 登录服务
 app.post("/WS/wechat/login", function(req, res){

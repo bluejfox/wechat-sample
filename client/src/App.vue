@@ -1,22 +1,66 @@
 <template>
-  <transition :name="transitionName">
-    <router-view></router-view>
-  </transition>
+  <div>
+    <transition :name="transitionName">
+      <router-view></router-view>
+    </transition>
+    <one-error-message :visible.sync="errorMessage.visible" :message="errorMessage.msg">
+    </one-error-message>
+  </div>
 </template>
 
 <script>
-export default {
-  name: 'app',
-  data() {
-    return {
-    };
-  },
-  computed: {
-    transitionName() {
-      return this.$store.state.common.direction === 'back' ? 'slide-out' : 'slide-in';
+  import { LoadingIndicator } from '@/component/ui';
+  import ErrorHandler from '@/model/ErrorHandler';
+  import Vue from 'vue';
+
+  export default {
+    name: 'app',
+    computed: {
+      transitionName() {
+        return this.$store.state.common.direction === 'back' ? 'slide-out' : 'slide-in';
+      },
+      loadingState() {
+        return this.$store.state.common.loading;
+      },
     },
-  },
-};
+    watch: {
+      loadingState: {
+        immediate: true,
+        handler(val) {
+          if (val) {
+            LoadingIndicator.show();
+          } else {
+            LoadingIndicator.hide();
+          }
+        },
+      },
+    },
+    created() {
+      Vue.config.errorHandler = (err, vm) => {
+        this.handleAppError(err, vm);
+      };
+      window.onerror = (err) => {
+        this.handleAppError(err);
+      };
+    },
+    data() {
+      return {
+        errorMessage: {
+          msg: '',
+          visible: false,
+        },
+      };
+    },
+    methods: {
+      handleAppError(error, source) {
+        // 取得错误内容
+        const errorMessage = ErrorHandler.handleError(error, source);
+        // 显示错误
+        this.errorMessage.msg = errorMessage.message;
+        this.errorMessage.visible = true;
+      },
+    },
+  };
 </script>
 
 <style>

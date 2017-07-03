@@ -1,7 +1,7 @@
 <template>
   <one-popup
-    class="mt-message"
-    :class="[customClass, messageClass]"
+    class="straw-message straw-message-error"
+    :class="[customClass]"
     v-model="visible"
     position="top"
     :modal="false">
@@ -9,22 +9,21 @@
   </one-popup>
 </template>
 <style>
-  .mt-message {
+  .straw-message {
     width: 100%;
     text-align: center;
     opacity: 0.8;
   }
-  .mt-message-error {
+  .straw-message-error {
     background-color: crimson;
     color: white;
   }
 </style>
 <script>
   export default {
-    name: 'OneMessage',
+    name: 'OneErrorMessage',
     props: {
       message: String,
-      type: String,
       customClass: String,
       duration: {
         type: Number,
@@ -33,11 +32,6 @@
       visible: {
         type: Boolean,
         default: false,
-      },
-    },
-    computed: {
-      messageClass() {
-        return `mt-message-${this.type}`;
       },
     },
     watch: {

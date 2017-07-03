@@ -7,17 +7,12 @@
     <br/>
     <img :src="user.headimgurl">
     <input type="button" @click="doForward" value="JSSDK Demo"/>
-    <input type="button" @click="popupVisible = true" value="showPopup">
-    <one-message
-      :visible.sync="popupVisible"
-      type="error"
-      message="123457">
-    </one-message>
   </div>
 </template>
 <style scoped>
 </style>
 <script>
+  import UmeHttp from '@/model/UmeHttp';
   import Util from '@/model/Util';
 
   export default {
@@ -25,7 +20,6 @@
       return {
         currentCount: 0,
         user: {},
-        popupVisible: false,
       };
     },
     created() {
@@ -41,7 +35,7 @@
     methods: {
       doLogin() {
         const code = Util.getUrlParameter('code');
-        this.$service.call('login', {
+        UmeHttp.invoke('wechat/login', {
           code,
         }).then((res) => {
           this.user = res;

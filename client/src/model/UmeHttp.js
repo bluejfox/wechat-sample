@@ -1,6 +1,7 @@
 import Auth from '@/model/Auth';
 import ApplicationError from '@/model/ApplicationError';
 import Util from '@/model/Util';
+import store from '@/store';
 import Http from './Http';
 
 /**
@@ -45,6 +46,17 @@ function createGetUrl(serviceId, serviceParam) {
   return `${url}/${serviceId}/${requestData}`;
 }
 
+/**
+ * 抛出异常处理
+ * 因Firefox目前还不支持unhandledrejection，暂时将错误统一抛出至window.onerror事件
+ * @param  {Object} error 拥有message键值的对象
+ */
+function throwError(error) {
+  if (window.onerror) {
+    window.onerror(error);
+  }
+}
+
 export default class UmeHttp {
   /**
    * 执行指定服务
@@ -69,7 +81,8 @@ export default class UmeHttp {
     }
     // 超时时间
     umeConfig.timeout = Util.getConfigValue('SERVICE_TIME_OUT');
-
+    // 设置加载提示状态
+    store.commit('loading', true);
     return new Promise((resolve, reject) => {
       // 调用指定服务
       Http[method](url, serviceParam, umeConfig).then((res) => {
@@ -79,11 +92,23 @@ export default class UmeHttp {
           const exceptions = Util.isEmpty(resData.exceptions) ?
             [] : resData.exceptions;
           const error = createAppErrByServerException(exceptions);
-          reject(error);
+          if (config.isShowError === false) {
+            reject(error);
+          } else {
+            throwError(error);
+          }
         }
         resolve(resData.resultObject);
+        // 重置加载提示状态
+        store.commit('loading', false);
       }).catch((error) => {
-        reject(error);
+        if (config.isShowError === false) {
+          reject(error);
+        } else {
+          throwError(error);
+        }
+        // 重置加载提示状态
+        store.commit('loading', false);
       });
     });
   }

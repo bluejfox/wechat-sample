@@ -1,10 +1,11 @@
 import StrawUI from 'straw-ui';
 import 'straw-ui/lib/style.css';
 import Util from '@/model/Util';
-import Message from './package/Message';
+import ErrorMessage from './package/ErrorMessage';
+import LoadingIndicator from './package/LoadingIndicator';
 
 const COMPONENTS = {
-  Message,
+  ErrorMessage,
 };
 
 function install(Vue) {
@@ -40,5 +41,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 const UI = Object.assign({}, StrawUI, {
   install,
+  LoadingIndicator,
 });
 export default UI;
+export { LoadingIndicator };
