@@ -57,6 +57,9 @@ function throwError(error) {
   }
 }
 
+// 服务正常执行成功的状态码
+const SERVICE_EXEC_SUCCESS_CODE = 0;
+
 export default class UmeHttp {
   /**
    * 调用指定服务
@@ -88,7 +91,7 @@ export default class UmeHttp {
       Http[method](url, serviceParam, umeConfig).then((res) => {
         const resData = res.data;
         // 收到错误信息的场合
-        if (resData.resultCode !== 0) {
+        if (resData.resultCode !== SERVICE_EXEC_SUCCESS_CODE) {
           const exceptions = Util.isEmpty(resData.exceptions) ?
             [] : resData.exceptions;
           const error = createAppErrByServerException(exceptions);
