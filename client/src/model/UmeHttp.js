@@ -122,11 +122,11 @@ export default class UmeHttp {
    * 如果想调用WS001和WS002两个服务，可以使用如下方式调用：
    * const ws001 = {
    *  id: 'WS001',
-   *  param: [aaa],
+   *  params: [aaa],
    * };
    * const ws002 = {
    *  id: 'WS002',
-   *  param: [bbb],
+   *  params: [bbb],
    * };
    * const serviceArr = [ws001, ws002];
    * UmeHttp.invokeMulti(serviceArr).then((res) => {})
@@ -137,7 +137,7 @@ export default class UmeHttp {
    */
   static invokeMulti(serviceArr, config = {}) {
     const promiseArr = serviceArr.map(serviceObject =>
-      UmeHttp.invoke(serviceObject.id, serviceObject.param, config));
+      UmeHttp.invoke(serviceObject.id, serviceObject.params, config));
     return Promise.all(promiseArr);
   }
 }

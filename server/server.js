@@ -102,8 +102,24 @@ app.post("/WS/wechat/authJsSdk", function(req, res){
   });
 });
 
-app.post("/WS/sample/*", function(req, res){
-  mock.call(req, res);
+app.post("/WS/sample/S001", function(req, res){
+  var id = req.body[0];
+  res.json({
+    "resultCode": 0,
+    "resultObject": {
+      data: 'id :: ' + id,
+    }
+  })
+});
+
+app.post("/WS/sample/S002", function(req, res){
+  var type = req.body[0];
+  res.json({
+    "resultCode": 0,
+    "resultObject": {
+      data: 'type :: ' + type,
+    }
+  })
 });
 
 app.listen(process.env.VCAP_APP_PORT || 3000);
