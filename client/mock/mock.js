@@ -2,6 +2,7 @@ var path = require('path');
 var fs = require('fs');
 var Mock = require('mockjs');
 var config = require('./config.js');
+var util = require('./util.js');
 var exclude = config.exclude;
 
 function isExclude(service) {
@@ -16,25 +17,33 @@ function isExclude(service) {
   return ret;
 }
 
-function getJsonFileFullPath(jsonPath) {
-  return path.resolve(__dirname, jsonPath);
+function requireUncached(module) {
+  delete require.cache[require.resolve(module)];
+  return require(module);
 }
 
-exports.call = function(proxyReq, req, res) {
-  var proxyPath = proxyReq.path;
+exports.call = function(req, res) {
+  var proxyPath = req.originalUrl;
   var jsonFilePath = null;
   var mockJson = null;
   if (proxyPath && proxyPath !== '' && proxyPath.indexOf('/') !== -1) {
     proxyPath = proxyPath.replace(config.baseUrl, '');
     try {
       if (!isExclude(proxyPath)) {
-        jsonFilePath = getJsonFileFullPath('./datasource/' + proxyPath + '.json');
-        mockJson = Mock.mock(JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')));
+        if (fs.existsSync(util.getFileFullPath('./datasource/' + proxyPath + '.js'))) {
+          var jsModule = requireUncached(util.getFileFullPath('./datasource/' + proxyPath + '.js'));
+          var folderPath = proxyPath.substring(0, proxyPath.lastIndexOf("/") + 1);
+          var webServiceId = proxyPath.substring(proxyPath.lastIndexOf("/") + 1);
+          mockJson = jsModule('./datasource/' + folderPath, webServiceId, req.body, req.query);
+        } else {
+          jsonFilePath = util.getFileFullPath('./datasource/' + proxyPath + '.json');
+          mockJson = Mock.mock(JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')));
+        }
       }
     } catch (error) {
-      jsonFilePath = getJsonFileFullPath('./datasource/error.json');
+      jsonFilePath = util.getFileFullPath('./datasource/error.json');
       mockJson = Mock.mock(JSON.parse(fs.readFileSync(jsonFilePath, 'utf-8')));
     }
   }
-  res.json(mockJson);
+  return mockJson;
 };

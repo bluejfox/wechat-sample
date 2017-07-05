@@ -1,5 +1,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 var path = require('path');
+var modifyResponse = require('node-http-proxy-json');
 var mock = require('../mock/mock.js');
 var devEnvObj = require('./dev.env');
 var prodEnvObj = require('./prod.env');
@@ -52,11 +53,35 @@ var pathRegex = '^' + proxyKey;
 config.dev.proxyTable[proxyKey] = {
   target: getEnvConfig('TARGET_WEBSERVICE_SERVER'),
   changeOrigin: true,
+  proxyTimeout: parseInt(devEnvObj.PROXY_HTTP_TIMEOUT, 10),
   onProxyReq: function(proxyReq, req, res) {
-    if (devEnvObj.MOCK_MODE === '"true"') {
-      mock.call(proxyReq, req, res);
+    if(req.body) {
+      var bodyData = JSON.stringify(req.body);
+      // incase if content-type is application/x-www-form-urlencoded -> we need to change to application/json
+      proxyReq.setHeader('Content-Type','application/json');
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      // stream the content
+      proxyReq.write(bodyData);
     }
-  }
+  },
+  onProxyRes: function(proxyRes, req, res) {
+    if (proxyRes.statusCode !== 200 && devEnvObj.MOCK_MODE === '"true"') {
+      delete proxyRes.headers['content-length'];
+      modifyResponse(res, proxyRes.headers['content-encoding'], function (body) {
+        body = mock.call(req, res);
+        console.log(body);
+        return body;
+      });
+      proxyRes.statusCode = 200;
+      proxyRes.statusMessage = 'OK';
+    }
+  },
+  onError: function(err, req, res) {
+    console.log(err.code);
+    if (devEnvObj.MOCK_MODE === '"true"') {
+      res.json(mock.call(req, res));
+    }
+  },
 }
 config.dev.proxyTable[proxyKey].pathRewrite = {};
 config.dev.proxyTable[proxyKey].pathRewrite[pathRegex] = '';

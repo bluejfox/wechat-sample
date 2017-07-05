@@ -102,6 +102,15 @@ app.post("/WS/wechat/authJsSdk", function(req, res){
   });
 });
 
+app.post("/WS/sample/WS002", function(req, res){
+  res.json({
+    "resultCode": 0,
+    "resultObject": {
+      data: 'WS002 :: execute successful!',
+    }
+  })
+});
+
 app.post("/WS/sample/S001", function(req, res){
   var id = req.body[0];
   res.json({
@@ -110,6 +119,15 @@ app.post("/WS/sample/S001", function(req, res){
       data: 'id :: ' + id,
     }
   })
+});
+
+app.get("/WS/sample/G001", function(req, res) {
+  res.json({
+    "resultCode": 0,
+    "resultObject": {
+      data: '1'
+    }
+  });
 });
 
 app.post("/WS/sample/S002", function(req, res){
