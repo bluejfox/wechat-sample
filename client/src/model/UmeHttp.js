@@ -1,7 +1,7 @@
 import Auth from '@/model/Auth';
 import ApplicationError from '@/model/ApplicationError';
 import Util from '@/model/Util';
-import store from '@/store';
+import store from '@/model/store';
 import Http from './Http';
 
 /**
@@ -85,7 +85,7 @@ export default class UmeHttp {
     // 超时时间
     umeConfig.timeout = Util.getConfigValue('SERVICE_TIME_OUT');
     // 设置加载提示状态
-    store.commit('loading', true);
+    store().commit('loading', true);
     return new Promise((resolve, reject) => {
       // 调用指定服务
       Http[method](url, serviceParam, umeConfig).then((res) => {
@@ -103,7 +103,7 @@ export default class UmeHttp {
         }
         resolve(resData.resultObject);
         // 重置加载提示状态
-        store.commit('loading', false);
+        store().commit('loading', false);
       }).catch((error) => {
         if (config.isShowError === false) {
           reject(error);
@@ -111,7 +111,7 @@ export default class UmeHttp {
           throwError(error);
         }
         // 重置加载提示状态
-        store.commit('loading', false);
+        store().commit('loading', false);
       });
     });
   }

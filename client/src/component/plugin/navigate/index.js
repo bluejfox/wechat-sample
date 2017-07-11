@@ -7,7 +7,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import routerConfig from '@/config/router';
 import Auth from '@/model/Auth';
-import store from '@/store';
+import store from '@/model/store';
 import NaviLink from './NaviLink';
 
 Vue.component(NaviLink.name, NaviLink);
@@ -48,14 +48,14 @@ const routeHistroy = {
 function getDirection(to, from, next) {
   const params = to.params;
   const currentPageFullPath = from.fullPath;
-  let direction = store.state.common.direction;
+  let direction = store().state.common.direction;
   let isExistForwardPage = false;
   const nextPageFullPath = to.fullPath;
   const history = routeHistroy.history;
   if (params && params.$$direction === 'forward') {
     direction = 'forward';
     // 保存跳转方向
-    store.commit('direction', direction);
+    store().commit('direction', direction);
   }
   // 浏览器前进／后退按钮点击 或 点击了页面链接 的场合
   if (direction !== 'forward' && direction !== 'back') {
@@ -95,14 +95,14 @@ function getDirection(to, from, next) {
         }
       }
       // 保存跳转方向
-      store.commit('direction', direction);
+      store().commit('direction', direction);
     }
   }
 
   if (direction === '') {
     direction = 'forward';
     // 保存跳转方向
-    store.commit('direction', direction);
+    store().commit('direction', direction);
   }
 
   // 更新浏览历史

@@ -4,9 +4,9 @@ import Vue from 'vue';
 import App from '@/App';
 import context from '@/component/plugin/context';
 import { router, navigate } from '@/component/plugin/navigate/index';
+import store from '@/component/plugin/store';
 import UI from '@/component/ui';
 import Util from '@/model/Util';
-import store from '@/store';
 
 // 加载公用UI控件
 // Vue.use(UI);
