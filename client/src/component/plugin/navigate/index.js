@@ -55,7 +55,7 @@ function getDirection(to, from, next) {
   if (params && params.$$direction === 'forward') {
     direction = 'forward';
     // 保存跳转方向
-    store().commit('direction', direction);
+    store().commit('common/direction', direction);
   }
   // 浏览器前进／后退按钮点击 或 点击了页面链接 的场合
   if (direction !== 'forward' && direction !== 'back') {
@@ -95,14 +95,14 @@ function getDirection(to, from, next) {
         }
       }
       // 保存跳转方向
-      store().commit('direction', direction);
+      store().commit('common/direction', direction);
     }
   }
 
   if (direction === '') {
     direction = 'forward';
     // 保存跳转方向
-    store().commit('direction', direction);
+    store().commit('common/direction', direction);
   }
 
   // 更新浏览历史
@@ -150,7 +150,7 @@ function plugin() {
     }
     routeHistroy.history.push(context.$router.currentRoute.fullPath);
     routeHistroy.currentIndex = routeHistroy.history.length - 1;
-    context.$store.commit('direction', 'forward');
+    context.$store.commit('common/direction', 'forward');
     context.$router.push({
       name,
       params,
@@ -160,13 +160,13 @@ function plugin() {
 
   function forward() {
     const context = this;
-    context.$store.commit('direction', 'forward');
+    context.$store.commit('common/direction', 'forward');
     context.$router.forward();
   }
 
   function back() {
     const context = this;
-    context.$store.commit('direction', 'back');
+    context.$store.commit('common/direction', 'back');
     context.$router.back();
   }
 
@@ -175,7 +175,7 @@ function plugin() {
   // }
   Vue.mixin({
     destroyed() {
-      this.$store.commit('direction', '');
+      this.$store.commit('common/direction', '');
     },
   });
 
