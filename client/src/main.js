@@ -8,8 +8,6 @@ import store from '@/component/plugin/store';
 import UI from '@/component/ui';
 import Util from '@/model/Util';
 
-// 加载公用UI控件
-// Vue.use(UI);
 // 生产环境的场合
 if (Util.isProdunctionEnv()) {
   // 不显示Vue日志和警告
@@ -18,6 +16,7 @@ if (Util.isProdunctionEnv()) {
   Vue.config.productionTip = false;
 }
 
+// 加载公用UI控件
 Vue.use(UI);
 Vue.use(context);
 Vue.use(navigate);
