@@ -3,6 +3,7 @@ import 'straw-ui/lib/style.css';
 import Util from '@/model/Util';
 import ErrorMessage from './package/ErrorMessage';
 import LoadingIndicator from './package/LoadingIndicator';
+import '../style/index.css';
 
 const COMPONENTS = {
   ErrorMessage,
