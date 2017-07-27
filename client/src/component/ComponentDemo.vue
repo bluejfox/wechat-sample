@@ -6,6 +6,9 @@
       <one-swipe-item style="background-color:gray;">3</one-swipe-item>
     </one-swipe>
     <div class="gutter">
+      <one-button type="primary" @click="throwError">抛出异常</one-button>
+    </div>
+    <div class="gutter">
       <one-button type="primary" @click="showIndicator">显示加载框(2s后关闭)</one-button>
     </div>
     <div class="gutter">
@@ -25,6 +28,7 @@
 <script>
   import { LoadingIndicator } from '@/component/ui';
   import SampleResource from '@/model/resource/SampleResource';
+  import ApplicationError from '@/model/ApplicationError';
 
   export default {
     data() {
@@ -33,6 +37,9 @@
       };
     },
     methods: {
+      throwError() {
+        throw new ApplicationError('MAM008E');
+      },
       showIndicator() {
         LoadingIndicator.show();
         setTimeout(() => {

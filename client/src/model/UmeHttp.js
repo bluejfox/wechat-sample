@@ -48,13 +48,11 @@ function createGetUrl(serviceId, serviceParam) {
 
 /**
  * 抛出异常处理
- * 因Firefox目前还不支持unhandledrejection，暂时将错误统一抛出至window.onerror事件
+ *
  * @param  {Object} error 拥有message键值的对象
  */
 function throwError(error) {
-  if (window.onerror) {
-    window.onerror(error);
-  }
+  throw error;
 }
 
 // 服务正常执行成功的状态码
@@ -89,6 +87,8 @@ export default class UmeHttp {
     return new Promise((resolve, reject) => {
       // 调用指定服务
       Http[method](url, serviceParam, umeConfig).then((res) => {
+        // 重置加载提示状态
+        store().commit('common/loading', false);
         const resData = res.data;
         // 收到错误信息的场合
         if (resData.resultCode !== SERVICE_EXEC_SUCCESS_CODE) {
@@ -97,21 +97,22 @@ export default class UmeHttp {
           const error = createAppErrByServerException(exceptions);
           if (config.isShowError === false) {
             reject(error);
+          } else if (Object.hasOwnProperty.call(window, 'onunhandledrejection')) {
+            reject(error);
+          // 浏览器不支持unhandledrejection的场合
           } else {
-            throwError(error);
+            throw error;
           }
         }
         resolve(resData.resultObject);
+      }).catch((error) => {
         // 重置加载提示状态
         store().commit('common/loading', false);
-      }).catch((error) => {
         if (config.isShowError === false) {
           reject(error);
         } else {
           throwError(error);
         }
-        // 重置加载提示状态
-        store().commit('common/loading', false);
       });
     });
   }

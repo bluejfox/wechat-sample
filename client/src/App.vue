@@ -42,6 +42,9 @@
       window.onerror = (err) => {
         this.handleAppError(err);
       };
+      window.onunhandledrejection = (err) => {
+        this.handleAppError(err);
+      };
     },
     data() {
       return {
@@ -54,10 +57,14 @@
     methods: {
       handleAppError(error, source) {
         // 取得错误内容
-        const errorMessage = ErrorHandler.handleError(error, source);
+        const errorObject = ErrorHandler.handleError(error, source);
         // 显示错误
-        this.errorMessage.msg = errorMessage.message;
+        this.errorMessage.msg = errorObject.message;
         this.errorMessage.visible = true;
+        // 登陆状态失效的场合
+        if (errorObject.id === 'MAM002E') {
+          // do something
+        }
       },
     },
   };

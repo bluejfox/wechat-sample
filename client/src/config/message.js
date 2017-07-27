@@ -19,5 +19,6 @@ const MESSAGE = {
   MCM002I: '{0}数据已成功修改。',
   MCM003I: '{0}数据已成功删除。',
   MCM004W: '此操作将删除这条数据，是否继续？',
+  MAM008E: '测试系统错误。',
 };
 export default MESSAGE;
